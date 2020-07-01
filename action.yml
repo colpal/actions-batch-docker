@@ -1,10 +1,22 @@
-name: 'actions-template'
-author: ''
-description: 'description'
+name: 'populate-dagbag'
+author: 'Don Kim'
+description: 'Repopulate an airflow dagbag'
 inputs:
-  input_one:
-    description: ''
-    required: false
+  project:
+    description: 'Project that contains airflow server'
+    required: true
+  cluster:
+    description: 'Cluster that contains airflow server'
+    required: true
+  zone:
+    description: 'Zone that the airflow server is set in'
+    required: true
+  namespace:
+    description: 'Namespace for airflow server'
+    required: true
+  pod_label:
+    description: 'Pod label'
+    required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'
