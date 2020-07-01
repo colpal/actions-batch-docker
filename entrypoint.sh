@@ -3,6 +3,8 @@
 set -eux
 
 echo "$INPUT_SERVICE_ACCOUNT_KEY"
+echo "$INPUT_PROJECT"
+echo "$INPUT_ZONE"
 
 echo "$INPUT_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/service_account.json
 
