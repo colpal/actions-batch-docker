@@ -2,9 +2,6 @@ name: 'populate-dagbag'
 author: 'Don Kim'
 description: 'Repopulate an airflow dagbag'
 inputs:
-  service_account_key:
-    description: 'Service Account key for authentication'
-    required: true
   project:
     description: 'Project that contains airflow server'
     required: true
