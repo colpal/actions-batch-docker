@@ -1,9 +1,9 @@
 FROM google/cloud-sdk:alpine
 
-LABEL name="action-template"
+LABEL name="populate-dagbag"
 LABEL version="1.0.0"
-LABEL com.github.actions.name="Action Name"
-LABEL com.github.actions.description="Action Description"
+LABEL com.github.actions.name="Populate Dagbag"
+LABEL com.github.actions.description="Github Action to repopulate an airflow dagbag"
 LABEL com.github.actions.color="blue"
 LABEL com.github.actions.icon="cloud"
 
