@@ -1,5 +1,7 @@
 FROM google/cloud-sdk:alpine
 
+RUN apk install kubectl
+
 LABEL name="populate-dagbag"
 LABEL version="1.0.0"
 LABEL com.github.actions.name="Populate Dagbag"
