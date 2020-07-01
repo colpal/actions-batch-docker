@@ -1,0 +1,10 @@
+name: 'actions-template'
+author: ''
+description: 'description'
+inputs:
+  input_one:
+    description: ''
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
