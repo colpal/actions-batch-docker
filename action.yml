@@ -1,25 +1,18 @@
-name: 'populate-dagbag'
-author: 'Don Kim'
-description: 'Repopulate an airflow dagbag'
+---
+name: Populate DAGbag
+description: Build and Upload all DAG docker images in a repository
 inputs:
-  service_account_key:
-    description: 'Service Account key for authentication'
+  service-account-key:
+    description: Service account credentials to upload to GCR
+    required: true
+  root-directory:
+    description: The root directory that contains each of the DAG directories
+    required: true
+  changed-files:
+    description: A list of files that have changed since the last workflow run
     required: true
   project:
-    description: 'Project that contains airflow server'
-    required: true
-  cluster:
-    description: 'Cluster that contains airflow server'
-    required: true
-  zone:
-    description: 'Zone that the airflow server is set in'
-    required: true
-  namespace:
-    description: 'Namespace for airflow server'
-    required: true
-  pod_label:
-    description: 'Pod label'
-    required: true
+    description: GCP project that contains the intended GCR target
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: node12
+  main: dist/main.js
