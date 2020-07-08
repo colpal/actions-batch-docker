@@ -2,9 +2,6 @@
 name: Populate DAGbag
 description: Build and Upload all DAG docker images in a repository
 inputs:
-  service-account-key:
-    description: Service account credentials to upload to GCR
-    required: true
   root-directory:
     description: The root directory that contains each of the DAG directories
     required: true
