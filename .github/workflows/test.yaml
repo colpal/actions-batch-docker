@@ -14,5 +14,8 @@ jobs:
         uses: ./
         with:
           root-directory: test/dags
-          changed-files: ${{ steps.changed.outputs.json }}
+          changed-files:
+            - 'test/ ags/dag-1/Dockerfile.dag-1'
+            - 'test/dags/dag-2/Dockerfile.dag-2'
+            - 'test/unrelated.txt'
           project: cp-sandbox-nicholas-farl671
