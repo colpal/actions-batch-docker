@@ -8,9 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.1
-      - name: Run colpal/actions-populate-dagbag
+      - name: Run colpal/actions-batch-docker
         uses: ./
         with:
-          root-directory: test/dags
-          changed-files: '["test/dags/dag-1/Dockerfile.dag-1","test/dags/dag-2/Dockerfile.dag-2","test/unrelated.txt"]'
+          root-directory: test/images
+          changed-files: |
+            [
+              "test/images/image-1/Dockerfile.image-1",
+              "test/images/image-2/Dockerfile.image-2",
+              "test/unrelated.txt"
+            ]
           project: cp-sandbox-nicholas-farl671

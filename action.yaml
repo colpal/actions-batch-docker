@@ -1,9 +1,9 @@
 ---
-name: Populate DAGbag
-description: Build and Upload all DAG docker images in a repository
+name: Batch Docker
+description: Build and upload a directory full of docker contexts easily
 inputs:
   root-directory:
-    description: The root directory that contains each of the DAG directories
+    description: The root directory that contains each of the image directories
     required: true
   changed-files:
     description: A list of files that have changed since the last workflow run
