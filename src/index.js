@@ -41,7 +41,9 @@ function includesBy(set, fn) {
         const tag = `gcr.io/${project}/${image}:${gitSHA}`;
         const cwd = path.dirname(file);
         await exec('docker', ['build', '-f', filename, '-t', tag, '.'], { cwd });
-        await exec('docker', ['push', tag]);
+        if (await exec('docker', ['push', tag]) !== 0) {
+          core.setFailed(`Docker push failed for ${file}`);
+        }
       });
 
     await Promise.allSettled(dockerfiles);
