@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.4",
-    "@actions/exec": "^1.0.4"
+    "@actions/exec": "^1.0.4",
+    "@actions/glob": "^0.1.0"
   }
 }
