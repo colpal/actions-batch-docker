@@ -10,6 +10,6 @@ const core = require('@actions/core');
   console.log(relativeChanged);
   const relevantChanged = relativeChanged.filter((p) => !p.startsWith('../'));
   console.log(relevantChanged);
-  const changedDirectories = relevantChanged.map((p) => path.parse(p).root);
+  const changedDirectories = relevantChanged.map((p) => p.split('/')[0])
   console.log(changedDirectories);
 })();
