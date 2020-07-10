@@ -40,7 +40,7 @@ function includesBy(set, fn) {
         const gitSHA = process.env.GITHUB_SHA;
         const tag = `gcr.io/${project}/${image}:${gitSHA}`;
         const cwd = path.dirname(file);
-        await exec('docker', ['build', '-f', filename, '-t', tag], { cwd });
+        await exec('docker', ['build', '-f', filename, '-t', tag, '.'], { cwd });
       });
     await Promise.all(dockerfiles);
     await exec('docker', ['image', 'list']);
