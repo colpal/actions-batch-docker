@@ -2,6 +2,7 @@ const path = require('path');
 
 const core = require('@actions/core');
 const glob = require('@actions/glob');
+const { exec } = require('@actions/exec');
 
 function includesBy(set, fn) {
   for (const item of set) { // eslint-disable-line no-restricted-syntax
@@ -13,6 +14,7 @@ function includesBy(set, fn) {
 }
 
 (async () => {
+  const project = core.getInput('project', { required: true });
   const rootDirectory = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
 
@@ -27,12 +29,18 @@ function includesBy(set, fn) {
   const matches = await globber.glob();
 
   const dockerfiles = matches
-    .map((file) => path.relative(rootDirectory, file))
     .filter((file) => {
-      const dirname = path.dirname(file);
+      const dirname = path.dirname(path.relative(rootDirectory, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
+    })
+    .map(async (file) => {
+      const filename = path.basename(file);
+      const image = filename.match(/^Dockerfile\.(.*)$/)[1];
+      const gitSHA = process.env.GITHUB_SHA;
+      const tag = `gcr.io/${project}/${image}:${gitSHA}`;
+      const cwd = path.dirname(file);
+      await exec('docker', ['build', '-f', filename, '-t', tag], { cwd });
     });
-
-  console.log(relevantChanges);
-  console.log(dockerfiles);
+  await Promise.all(dockerfiles);
+  await exec('docker', ['image', 'list']);
 })();
