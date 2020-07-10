@@ -29,7 +29,7 @@ function includesBy(set, fn) {
     const globber = await glob.create(path.resolve(rootDirectory, '**', 'Dockerfile.*'));
     const matches = await globber.glob();
 
-    const dockerfiles = matches
+    const pipelines = matches
       .filter((file) => {
         const dirname = path.dirname(path.relative(rootDirectory, file));
         return includesBy(relevantChanges, (change) => change.startsWith(dirname));
@@ -44,9 +44,8 @@ function includesBy(set, fn) {
         await exec('docker', ['push', tag]);
       });
 
-    const rejected = (await Promise.allSettled(dockerfiles))
-      .filter(({ status }) => status === 'rejected');
-    if (rejected.length > 0) core.setFailed(rejected.map((r) => r.reason));
+    const rejected = (await Promise.allSettled(pipelines)).filter((r) => r.status === 'rejected');
+    if (rejected.length > 0) core.setFailed('One or more docker build & push pipelines failed');
   } catch (error) {
     core.setFailed(error);
   }
