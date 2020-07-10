@@ -44,7 +44,9 @@ function includesBy(set, fn) {
         await exec('docker', ['push', tag]);
       });
 
-    await Promise.allSettled(dockerfiles);
+    const rejected = (await Promise.allSettled(dockerfiles))
+      .filter(({ status }) => status === 'rejected');
+    if (rejected.length > 0) core.setFailed(rejected.map((r) => r.reason));
   } catch (error) {
     core.setFailed(error);
   }
