@@ -25,6 +25,7 @@ function try$(a) {
       .then((x) => [null, x])
       .catch((err) => [err, null]);
   }
+  return ['try$ was not invoked with an eligible argument', null];
 }
 
 (async () => {
