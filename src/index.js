@@ -13,6 +13,20 @@ function includesBy(set, fn) {
   return false;
 }
 
+function try$(a) {
+  if (a instanceof Function) {
+    try {
+      return [null, a()];
+    } catch (err) {
+      return [err, null];
+    }
+  } else if (a instanceof Promise) {
+    return a
+      .then((x) => [null, x])
+      .catch((err) => [err, null]);
+  }
+}
+
 (async () => {
   const project = core.getInput('project', { required: true });
   const rootDirectory = core.getInput('root-directory', { required: true });
