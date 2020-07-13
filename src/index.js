@@ -14,39 +14,35 @@ function includesBy(set, fn) {
 }
 
 (async () => {
-  try {
-    const project = core.getInput('project', { required: true });
-    const rootDirectory = core.getInput('root-directory', { required: true });
-    const changedFiles = core.getInput('changed-files', { required: true });
+  const project = core.getInput('project', { required: true });
+  const rootDirectory = core.getInput('root-directory', { required: true });
+  const changedFiles = core.getInput('changed-files', { required: true });
 
-    const relevantChanges = new Set(
-      JSON
-        .parse(changedFiles)
-        .map((p) => path.relative(rootDirectory, p))
-        .filter((p) => !p.startsWith('../')),
-    );
+  const relevantChanges = new Set(
+    JSON
+      .parse(changedFiles)
+      .map((p) => path.relative(rootDirectory, p))
+      .filter((p) => !p.startsWith('../')),
+  );
 
-    const globber = await glob.create(path.resolve(rootDirectory, '**', 'Dockerfile.*'));
-    const matches = await globber.glob();
+  const globber = await glob.create(path.resolve(rootDirectory, '**', 'Dockerfile.*'));
+  const matches = await globber.glob();
 
-    const pipelines = matches
-      .filter((file) => {
-        const dirname = path.dirname(path.relative(rootDirectory, file));
-        return includesBy(relevantChanges, (change) => change.startsWith(dirname));
-      })
-      .map(async (file) => {
-        const filename = path.basename(file);
-        const image = filename.match(/^Dockerfile\.(.*)$/)[1];
-        const gitSHA = process.env.GITHUB_SHA;
-        const tag = `gcr.io/${project}/${image}:${gitSHA}`;
-        const cwd = path.dirname(file);
-        await exec('docker', ['build', '-f', filename, '-t', tag, '.'], { cwd });
-        await exec('docker', ['push', tag]);
-      });
+  const pipelines = matches
+    .filter((file) => {
+      const dirname = path.dirname(path.relative(rootDirectory, file));
+      return includesBy(relevantChanges, (change) => change.startsWith(dirname));
+    })
+    .map(async (file) => {
+      const filename = path.basename(file);
+      const image = filename.match(/^Dockerfile\.(.*)$/)[1];
+      const gitSHA = process.env.GITHUB_SHA;
+      const tag = `gcr.io/${project}/${image}:${gitSHA}`;
+      const cwd = path.dirname(file);
+      await exec('docker', ['build', '-f', filename, '-t', tag, '.'], { cwd });
+      await exec('docker', ['push', tag]);
+    });
 
-    const rejected = (await Promise.allSettled(pipelines)).filter((r) => r.status === 'rejected');
-    if (rejected.length > 0) core.setFailed('One or more docker build & push pipelines failed');
-  } catch (error) {
-    core.setFailed(error);
-  }
+  const rejected = (await Promise.allSettled(pipelines)).filter((r) => r.status === 'rejected');
+  if (rejected.length > 0) core.setFailed('One or more docker build & push pipelines failed');
 })();
