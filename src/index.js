@@ -78,8 +78,7 @@ function try$(a) {
       ));
       if (buildError) throw new Error(`Could not build '${file}'`);
 
-      const [deployError, deployCode] = await try$(exec('docker', ['push', tag]));
-      console.log(deployError, deployCode);
+      const [deployError] = await try$(exec('docker', ['push', tag]));
       if (deployError) throw new Error(`Could not deploy '${tag}'`);
 
       return undefined;
@@ -90,6 +89,7 @@ function try$(a) {
     .then((pipes) => pipes.filter((pipe) => pipe.status === 'rejected'));
 
   if (rejected.length > 0) {
+    console.log(rejected);
     core.setFailed(rejected.map((pipe) => pipe.reason));
   }
 })();
