@@ -78,7 +78,8 @@ function try$(a) {
       ));
       if (buildError) return new Error(`Could not build '${file}'`);
 
-      const [deployError] = await try$(exec('docker', ['push', tag]));
+      const [deployError, deployCode] = await try$(exec('docker', ['push', tag]));
+      console.log(deployError, deployCode);
       if (deployError) return new Error(`Could not deploy '${tag}'`);
 
       return undefined;
