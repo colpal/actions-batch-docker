@@ -33,15 +33,31 @@ function try$(a) {
   const rootDirectory = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
 
+  const [parseError, parsedFiles] = try$(() => JSON.parse(changedFiles));
+  if (parseError) {
+    core.setFailed(`Could not parse changed-files as valid JSON: ${parseError}`);
+    return;
+  }
+
   const relevantChanges = new Set(
-    JSON
-      .parse(changedFiles)
+    parsedFiles
       .map((p) => path.relative(rootDirectory, p))
       .filter((p) => !p.startsWith('../')),
   );
 
-  const globber = await glob.create(path.resolve(rootDirectory, '**', 'Dockerfile.*'));
-  const matches = await globber.glob();
+  const [globberError, globber] = await try$(glob.create(
+    path.resolve(rootDirectory, '**', 'Dockerfile.*'),
+  ));
+  if (globberError) {
+    core.setFailed(`Could not create glob for eligible Dockerfiles: ${globberError}`);
+    return;
+  }
+
+  const [matchError, matches] = await try$(globber.glob());
+  if (matchError) {
+    core.setFailed(`Could not execute glob for Dockerfiles: ${matchError}`);
+    return;
+  }
 
   const pipelines = matches
     .filter((file) => {
@@ -54,10 +70,25 @@ function try$(a) {
       const gitSHA = process.env.GITHUB_SHA;
       const tag = `gcr.io/${project}/${image}:${gitSHA}`;
       const cwd = path.dirname(file);
-      await exec('docker', ['build', '-f', filename, '-t', tag, '.'], { cwd });
-      await exec('docker', ['push', tag]);
+
+      const [buildError] = await try$(exec(
+        'docker',
+        ['build', '-f', filename, '-t', tag, '.'],
+        { cwd },
+      ));
+      if (buildError) return new Error(`Could not build '${file}'`);
+
+      const [deployError] = await try$(exec('docker', ['push', tag]));
+      if (deployError) return new Error(`Could not deploy '${tag}'`);
+
+      return undefined;
     });
 
-  const rejected = (await Promise.allSettled(pipelines)).filter((r) => r.status === 'rejected');
-  if (rejected.length > 0) core.setFailed('One or more docker build & push pipelines failed');
+  const rejected = await Promise
+    .allSettled(pipelines)
+    .then((pipes) => pipes.filter((pipe) => pipe.status === 'rejected'));
+
+  if (rejected.length > 0) {
+    core.setFailed(rejected.map((pipe) => pipe.reason));
+  }
 })();
