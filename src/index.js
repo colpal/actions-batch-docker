@@ -88,8 +88,5 @@ function try$(a) {
     .allSettled(pipelines)
     .then((pipes) => pipes.filter((pipe) => pipe.status === 'rejected'));
 
-  if (rejected.length > 0) {
-    console.log(rejected);
-    core.setFailed(rejected.map((pipe) => pipe.reason));
-  }
+  rejected.forEach((reject) => core.setFailed(reject.reason));
 })();
