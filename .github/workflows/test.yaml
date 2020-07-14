@@ -14,8 +14,8 @@ jobs:
           root-directory: test/images
           changed-files: |
             [
-              "test/images/image-1/Dockerfile.image-1",
-              "test/images/image-2/Dockerfile.image-2",
+              "test/images/big-images/Dockerfile.image-1",
+              "test/images/medium-images/Dockerfile.image-2",
               "test/unrelated.txt"
             ]
           project: cp-sandbox-nicholas-farl671
