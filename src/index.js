@@ -51,38 +51,27 @@ const buildThenDeploy = (project) => async (dockerfile) => {
 
 const main = async () => {
   const project = core.getInput('project', { required: true });
-  const rootDirectory = core.getInput('root-directory', { required: true });
+  const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
 
   const [parseError, parsedFiles] = try$(() => JSON.parse(changedFiles));
-  if (parseError) {
-    core.setFailed(`Could not parse changed-files as valid JSON: ${parseError}`);
-    return;
-  }
+  if (parseError) return core.setFailed(`Input changed-files is not valid JSON: ${parseError}`);
 
   const relevantChanges = new Set(
     parsedFiles
-      .map((p) => path.relative(rootDirectory, p))
+      .map((p) => path.relative(root, p))
       .filter((p) => !p.startsWith('../')),
   );
 
-  const [globberError, globber] = await try$(glob.create(
-    path.resolve(rootDirectory, '**', 'Dockerfile.*'),
-  ));
-  if (globberError) {
-    core.setFailed(`Could not create glob for eligible Dockerfiles: ${globberError}`);
-    return;
-  }
+  const [globError, globber] = await try$(glob.create(path.resolve(root, '**', 'Dockerfile.*')));
+  if (globError) return core.setFailed(`Can't create glob for Dockerfiles: ${globError}`);
 
   const [matchError, matches] = await try$(globber.glob());
-  if (matchError) {
-    core.setFailed(`Could not execute glob for Dockerfiles: ${matchError}`);
-    return;
-  }
+  if (matchError) return core.setFailed(`Can't execute glob for Dockerfiles: ${matchError}`);
 
   const pipelines = matches
     .filter((file) => {
-      const dirname = path.dirname(path.relative(rootDirectory, file));
+      const dirname = path.dirname(path.relative(root, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
     })
     .map(buildThenDeploy(project));
@@ -92,6 +81,7 @@ const main = async () => {
     .then((pipes) => pipes.filter((pipe) => pipe.status === 'rejected'));
 
   rejected.forEach((reject) => core.setFailed(reject.reason));
+  return undefined;
 };
 
 main();
