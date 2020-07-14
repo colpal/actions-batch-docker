@@ -34,7 +34,7 @@ const buildThenDeploy = (registry) => async (dockerfile) => {
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
-  const tag = path.resolve(registry, subfolder, `${image}:${gitSHA}`);
+  const tag = path.join(registry, subfolder, `${image}:${gitSHA}`);
 
   const [buildError] = await try$(exec(
     'docker',
