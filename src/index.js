@@ -50,15 +50,15 @@ const buildThenDeploy = (project) => async (dockerfile) => {
 };
 
 const main = async () => {
+  const project = core.getInput('project', { required: true });
+  const root = core.getInput('root-directory', { required: true });
+  const changedFiles = core.getInput('changed-files', { required: true });
+
   const [gcloudError] = await try$(exec('gcloud', ['version']));
   if (gcloudError) return core.setFailed('The "gcloud" executable is not available');
 
   const [dockerError] = await try$(exec('docker', ['version']));
   if (dockerError) return core.setFailed('The "docker" executable is not available');
-
-  const project = core.getInput('project', { required: true });
-  const root = core.getInput('root-directory', { required: true });
-  const changedFiles = core.getInput('changed-files', { required: true });
 
   const [parseError, parsedFiles] = try$(() => JSON.parse(changedFiles));
   if (parseError) return core.setFailed(`Input changed-files is not valid JSON: ${parseError}`);
