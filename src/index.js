@@ -49,7 +49,7 @@ const buildThenDeploy = (project) => async (dockerfile) => {
   return undefined;
 };
 
-(async () => {
+const main = async () => {
   const project = core.getInput('project', { required: true });
   const rootDirectory = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
@@ -92,4 +92,6 @@ const buildThenDeploy = (project) => async (dockerfile) => {
     .then((pipes) => pipes.filter((pipe) => pipe.status === 'rejected'));
 
   rejected.forEach((reject) => core.setFailed(reject.reason));
-})();
+};
+
+main();
