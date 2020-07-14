@@ -28,6 +28,27 @@ function try$(a) {
   return ['try$ was not invoked with an eligible argument', null];
 }
 
+const buildThenDeploy = (project) => async (dockerfile) => {
+  const filename = path.basename(dockerfile);
+  const image = filename.match(/^Dockerfile\.(.*)$/)[1];
+  const gitSHA = process.env.GITHUB_SHA;
+  const cwd = path.dirname(dockerfile);
+  const subfolder = path.basename(cwd);
+  const tag = `gcr.io/${project}/${subfolder}/${image}:${gitSHA}`;
+
+  const [buildError] = await try$(exec(
+    'docker',
+    ['build', '-f', filename, '-t', tag, '.'],
+    { cwd },
+  ));
+  if (buildError) throw new Error(`Could not build '${dockerfile}'`);
+
+  const [deployError] = await try$(exec('docker', ['push', tag]));
+  if (deployError) throw new Error(`Could not deploy '${tag}'`);
+
+  return undefined;
+};
+
 (async () => {
   const project = core.getInput('project', { required: true });
   const rootDirectory = core.getInput('root-directory', { required: true });
@@ -64,26 +85,7 @@ function try$(a) {
       const dirname = path.dirname(path.relative(rootDirectory, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
     })
-    .map(async (file) => {
-      const filename = path.basename(file);
-      const image = filename.match(/^Dockerfile\.(.*)$/)[1];
-      const gitSHA = process.env.GITHUB_SHA;
-      const cwd = path.dirname(file);
-      const subfolder = path.basename(cwd);
-      const tag = `gcr.io/${project}/${subfolder}/${image}:${gitSHA}`;
-
-      const [buildError] = await try$(exec(
-        'docker',
-        ['build', '-f', filename, '-t', tag, '.'],
-        { cwd },
-      ));
-      if (buildError) throw new Error(`Could not build '${file}'`);
-
-      const [deployError] = await try$(exec('docker', ['push', tag]));
-      if (deployError) throw new Error(`Could not deploy '${tag}'`);
-
-      return undefined;
-    });
+    .map(buildThenDeploy(project));
 
   const rejected = await Promise
     .allSettled(pipelines)
