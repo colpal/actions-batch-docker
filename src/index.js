@@ -4,16 +4,16 @@ const core = require('@actions/core');
 const glob = require('@actions/glob');
 const { exec } = require('@actions/exec');
 
-function includesBy(set, fn) {
+const includesBy = (set, fn) => {
   for (const item of set) { // eslint-disable-line no-restricted-syntax
     if (fn(item)) {
       return true;
     }
   }
   return false;
-}
+};
 
-function try$(a) {
+const try$ = (a) => {
   if (a instanceof Function) {
     try {
       return [null, a()];
@@ -26,7 +26,7 @@ function try$(a) {
       .catch((err) => [err, null]);
   }
   return ['try$ was not invoked with an eligible argument', null];
-}
+};
 
 const buildThenDeploy = (project) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
