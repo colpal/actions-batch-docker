@@ -68,8 +68,9 @@ function try$(a) {
       const filename = path.basename(file);
       const image = filename.match(/^Dockerfile\.(.*)$/)[1];
       const gitSHA = process.env.GITHUB_SHA;
-      const tag = `gcr.io/${project}/${image}:${gitSHA}`;
       const cwd = path.dirname(file);
+      const subfolder = path.basename(cwd);
+      const tag = `gcr.io/${project}/${subfolder}/${image}:${gitSHA}`;
 
       const [buildError] = await try$(exec(
         'docker',
