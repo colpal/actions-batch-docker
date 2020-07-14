@@ -71,6 +71,7 @@ function try$(a) {
       const cwd = path.dirname(file);
       const subfolder = path.basename(cwd);
       const tag = `gcr.io/${project}/${subfolder}/${image}:${gitSHA}`;
+      console.log(tag);
 
       const [buildError] = await try$(exec(
         'docker',
