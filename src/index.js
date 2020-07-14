@@ -28,13 +28,13 @@ const try$ = (a) => {
   return ['try$ was not invoked with an eligible argument', null];
 };
 
-const buildThenDeploy = (project) => async (dockerfile) => {
+const buildThenDeploy = (registry) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
-  const tag = `gcr.io/${project}/${subfolder}/${image}:${gitSHA}`;
+  const tag = path.resolve(registry, subfolder, `${image}:${gitSHA}`);
 
   const [buildError] = await try$(exec(
     'docker',
@@ -50,7 +50,7 @@ const buildThenDeploy = (project) => async (dockerfile) => {
 };
 
 const main = async () => {
-  const project = core.getInput('project', { required: true });
+  const registry = core.getInput('registry', { required: true });
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
 
@@ -80,7 +80,7 @@ const main = async () => {
       const dirname = path.dirname(path.relative(root, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
     })
-    .map(buildThenDeploy(project));
+    .map(buildThenDeploy(registry));
 
   const rejected = await Promise
     .allSettled(pipelines)

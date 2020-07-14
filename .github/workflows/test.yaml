@@ -18,4 +18,4 @@ jobs:
               "test/images/medium-images/Dockerfile.image-2",
               "test/unrelated.txt"
             ]
-          project: cp-sandbox-nicholas-farl671
+          registry: gcr.io/cp-sandbox-nicholas-farl671

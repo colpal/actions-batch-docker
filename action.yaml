@@ -8,8 +8,8 @@ inputs:
   changed-files:
     description: A list of files that have changed since the last workflow run
     required: true
-  project:
-    description: GCP project that contains the intended GCR target
+  registry:
+    description: The prefix for the Docker registry to push to
 runs:
   using: node12
   main: dist/main.js
