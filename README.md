@@ -36,10 +36,39 @@ steps:
   - uses: colpal/actions-batch-docker
     with:
       # The root directory that contains all of your docker directories
-      root-directory: your/image/directory
+      root-directory: tasks/
       # A JSON formatted list of files that changed since the last workflow run. This is used to
       # only build Docker images that could have changed
       changed-files: '${{ steps.changed.outputs.json }}'
       # The Docker registry prefix you are attempting to push to
       registry: gcr.io/your-project-id
 ```
+
+Assume your project structure looked like the following, with the starred files being those that
+had changes in the latest commit:
+
+```
+tasks/
+├── task-a
+│   ├── Dockerfile.debian
+│   └── Dockerfile.ubuntu *
+└── task-b
+    └── Dockerfile.alpine *
+.github/
+└── workflows
+    └── main.yaml
+unrelated/
+└── Dockerfile.centos *
+```
+
+This workflow would build/deploy the following:
+
+- `tasks/task-a/Dockerfile.ubuntu` would be tagged and deployed as
+  `gcr.io/your-project-id/task-a/ubuntu:$COMMIT_SHA`
+- `tasks/task-b/Dockerfile.alpine` would be tagged and deployed as
+  `gcr.io/your-project-id/task-b/alpine:$COMMIT_SHA`
+
+This workflow would **not** build/deploy the following:
+
+- `tasks/task-a/Dockerfile.debian` would not be built because it did not change
+- `unrelated/Dockerfile.centos` would not be built because it is outside of the root directory
