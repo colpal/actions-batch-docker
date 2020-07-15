@@ -50,20 +50,20 @@ const buildThenDeploy = (registry) => async (dockerfile) => {
   const subfolder = path.basename(cwd);
   const tag = path.join(registry, subfolder, `${image}:${gitSHA}`);
   const stamp = `${subfolder}/${filename}`;
-  const outputStream = stampStream(stamp);
-  outputStream.pipe(process.stdout);
+  const outStream = stampStream(stamp);
+  outStream.pipe(process.stdout);
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, '-t', tag, '.'], {
     cwd,
-    outputStream,
+    outStream,
     errStream,
   }));
   if (buildError) throw new Error(`Could not build '${dockerfile}'`);
 
   const [deployError] = await try$(exec('docker', ['push', tag], {
-    outputStream,
+    outStream,
     errStream,
   }));
   if (deployError) throw new Error(`Could not deploy '${tag}'`);
