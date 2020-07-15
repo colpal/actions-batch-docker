@@ -42,6 +42,8 @@ steps:
       changed-files: '${{ steps.changed.outputs.json }}'
       # The Docker registry prefix you are attempting to push to
       registry: gcr.io/your-project-id
+      # If set to 'false', the images will only be built and tagged. Defaults to 'true'
+      deploy: 'true'
 ```
 
 Assume your project structure looked like the following, with the starred files being those that
