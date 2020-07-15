@@ -37,8 +37,7 @@ const stampStream = (stamp) => new Transform({
       .split('\n')
       .map((line) => `[${stamp}] ${line}`)
       .join('\n');
-    console.log('LOG', newChunk);
-    callback(null, newChunk);
+    callback(null, `${newChunk}\n`);
   },
 });
 
