@@ -36,7 +36,8 @@ const stampStream = (stamp) => new Transform({
       chunk
         .toString()
         .trim()
-        .split('\n').map((line) => `[${stamp}] ${line}`)
+        .split('\n')
+        .map((line) => `[${stamp}] ${line}`)
         .join('\n'),
     );
   },
