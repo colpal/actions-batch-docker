@@ -41,7 +41,7 @@ const stampStream = (stamp) => new Transform({
   },
 });
 
-const buildThenDeploy = (registry) => async (dockerfile) => {
+const buildThenDeploy = (registry, shouldDeploy) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
   const gitSHA = process.env.GITHUB_SHA;
@@ -61,6 +61,8 @@ const buildThenDeploy = (registry) => async (dockerfile) => {
   }));
   if (buildError) throw new Error(`Could not build '${dockerfile}'`);
 
+  if (!shouldDeploy) return undefined;
+
   const [deployError] = await try$(exec('docker', ['push', tag], {
     outStream,
     errStream,
@@ -74,6 +76,7 @@ const main = async () => {
   const registry = core.getInput('registry', { required: true });
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
+  const shouldDeploy = core.getInput('deploy') !== 'false';
 
   const [gcloudError] = await try$(exec('gcloud', ['version']));
   if (gcloudError) return core.setFailed('The "gcloud" executable is not available');
@@ -101,7 +104,7 @@ const main = async () => {
       const dirname = path.dirname(path.relative(root, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
     })
-    .map(buildThenDeploy(registry));
+    .map(buildThenDeploy(registry, shouldDeploy));
 
   const rejected = await Promise
     .allSettled(pipelines)

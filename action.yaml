@@ -11,6 +11,8 @@ inputs:
   registry:
     description: The prefix for the Docker registry to push to
     required: true
+  deploy:
+    description: Set to 'false' to disable deployment
 runs:
   using: node12
   main: dist/main.js
