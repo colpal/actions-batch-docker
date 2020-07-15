@@ -10,6 +10,7 @@ inputs:
     required: true
   registry:
     description: The prefix for the Docker registry to push to
+    required: true
 runs:
   using: node12
   main: dist/main.js
