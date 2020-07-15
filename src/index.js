@@ -1,4 +1,5 @@
 const path = require('path');
+const { Transform } = require('stream');
 
 const core = require('@actions/core');
 const glob = require('@actions/glob');
@@ -28,6 +29,19 @@ const try$ = (a) => {
   return ['try$ was not invoked with an eligible argument', null];
 };
 
+const stampStream = (stamp) => new Transform({
+  transform(chunk, _encoding, callback) {
+    callback(
+      null,
+      chunk
+        .toString()
+        .trim()
+        .split('\n').map((line) => `[${stamp}] ${line}`)
+        .join('\n'),
+    );
+  },
+});
+
 const buildThenDeploy = (registry) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
@@ -35,15 +49,21 @@ const buildThenDeploy = (registry) => async (dockerfile) => {
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
   const tag = path.join(registry, subfolder, `${image}:${gitSHA}`);
+  const stamp = `${subfolder}/${filename}`;
+  const outputStream = stampStream(stamp).pipe(process.stdout);
+  const errStream = stampStream(stamp).pipe(process.stderr);
 
-  const [buildError] = await try$(exec(
-    'docker',
-    ['build', '-f', filename, '-t', tag, '.'],
-    { cwd },
-  ));
+  const [buildError] = await try$(exec('docker', ['build', '-f', filename, '-t', tag, '.'], {
+    cwd,
+    outputStream,
+    errStream,
+  }));
   if (buildError) throw new Error(`Could not build '${dockerfile}'`);
 
-  const [deployError] = await try$(exec('docker', ['push', tag]));
+  const [deployError] = await try$(exec('docker', ['push', tag], {
+    outputStream,
+    errStream,
+  }));
   if (deployError) throw new Error(`Could not deploy '${tag}'`);
 
   return undefined;
