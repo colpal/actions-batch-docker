@@ -33,7 +33,7 @@ steps:
   - id: changed
     uses: colpal/actions-changed-files@v1.0.0
 
-  - uses: colpal/actions-batch-docker
+  - uses: colpal/actions-batch-docker@v1.0.0
     with:
       # The root directory that contains all of your docker directories
       root-directory: tasks/
