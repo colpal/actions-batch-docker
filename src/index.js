@@ -31,15 +31,14 @@ const try$ = (a) => {
 
 const stampStream = (stamp) => new Transform({
   transform(chunk, _encoding, callback) {
-    callback(
-      null,
-      chunk
-        .toString()
-        .trim()
-        .split('\n')
-        .map((line) => `[${stamp}] ${line}`)
-        .join('\n'),
-    );
+    const newChunk = chunk
+      .toString()
+      .trim()
+      .split('\n')
+      .map((line) => `[${stamp}] ${line}`)
+      .join('\n');
+    console.log('LOG', newChunk);
+    callback(null, newChunk);
   },
 });
 
