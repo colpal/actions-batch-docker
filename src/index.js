@@ -103,8 +103,8 @@ const main = async () => {
       .filter((p) => !p.startsWith('../')),
   );
 
-  const [parseError, parsedImageTags] = try$(() => JSON.parse(imageTags));
-  if (parseError) return core.setFailed(`Input image-tags is not valid JSON: ${parseError}`);
+  const [tagParseError, parsedImageTags] = try$(() => JSON.parse(imageTags));
+  if (tagParseError) return core.setFailed(`Input image-tags is not valid JSON: ${parseError}`);
 
   const [globError, globber] = await try$(glob.create(path.resolve(root, '**', 'Dockerfile.*')));
   if (globError) return core.setFailed(`Can't create glob for Dockerfiles: ${globError}`);
