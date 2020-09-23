@@ -117,7 +117,7 @@ const main = async () => {
       const dirname = path.dirname(path.relative(root, file));
       return includesBy(relevantChanges, (change) => change.startsWith(dirname));
     })
-    .map(buildThenDeploy(registry, shouldDeploy, imageTags));
+    .map(buildThenDeploy(registry, shouldDeploy, parsedImageTags));
 
   const rejected = await Promise
     .allSettled(pipelines)
