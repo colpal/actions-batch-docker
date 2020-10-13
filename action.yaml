@@ -14,7 +14,7 @@ inputs:
   deploy:
     description: Set to 'false' to disable deployment
   image-tags:
-    description: Additional tags to add to the deployed images
+    description: Additional tags to add to the deployed images in the remote container repository
 runs:
   using: node12
   main: dist/main.js
