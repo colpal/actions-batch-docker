@@ -55,12 +55,14 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
-  const [buildError] = await try$(exec('docker', ['build', '-f', filename, '-t', tag, '.'], {
+  if (!imageTags) return undefined;
+
+  const [buildError] = await try$(exec('docker', ['build', '-f', filename, '-t', tag, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
     errStream,
   }));
-  if (buildError) throw new Error(`Could not build '${dockerfile}'`);
+  if (buildError) throw new Error(`Could not build image '${tag}' from dockerfile '${dockerfile}' with tags '${imageTags}'.`);
 
   if (!shouldDeploy) return undefined;
 
@@ -69,14 +71,6 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
     errStream,
   }));
   if (deployError) throw new Error(`Could not deploy '${tag}'`);
-
-  if (!imageTags) return undefined;
-
-  const [imageTagError] = await try$(exec('gcloud', ['container', 'images', 'add-tag', tag, imageTags.map((p) => `${imageName}:${p}`).join(' ')], {
-    outStream,
-    errStream,
-  }));
-  if (imageTagError) throw new Error(`Could not apply tags '${imageTags}' to image '${tag}'`);
 
   return undefined;
 };
