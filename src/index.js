@@ -80,7 +80,7 @@ const main = async () => {
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
   const shouldDeploy = core.getInput('deploy') !== 'false';
-  const imageTags = core.getInput('image-tags', { required: false }) 
+  const imageTags = core.getInput('image-tags', { required: false });
 
   const [gcloudError] = await try$(exec('gcloud', ['version']));
   if (gcloudError) return core.setFailed('The "gcloud" executable is not available');
