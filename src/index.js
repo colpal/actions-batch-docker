@@ -41,6 +41,14 @@ const stampStream = (stamp) => new Transform({
   },
 });
 
+const deployImage = async (tag, outStream, errStream) => {
+  const [deployError] = await try$(exec('docker', ['push', tag], {
+    outStream,
+    errStream,
+  }));
+  if (deployError) throw new Error(`Could not deploy '${tag}'`);
+};
+
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
@@ -55,22 +63,23 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
-  if (!imageTags) return undefined;
+  const execArgs = imageTags
+    ? ['build', '-f', filename, '-t', tag, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.']
+    : ['build', '-f', filename, '-t', tag, '.'];
 
-  const [buildError] = await try$(exec('docker', ['build', '-f', filename, '-t', tag, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
+  const [buildError] = await try$(exec('docker', execArgs, {
     cwd,
     outStream,
     errStream,
   }));
-  if (buildError) throw new Error(`Could not build image '${tag}' from dockerfile '${dockerfile}' with tags '${imageTags}'.`);
+  if (buildError) throw new Error(`Could not build image '${tag}' from dockerfile '${dockerfile}' with additional tags '${imageTags}'.`);
 
   if (!shouldDeploy) return undefined;
 
-  const [deployError] = await try$(exec('docker', ['push', tag], {
-    outStream,
-    errStream,
-  }));
-  if (deployError) throw new Error(`Could not deploy '${tag}'`);
+  deployImage(tag, outStream, errStream);
+  for (let tagPosition = 0; tagPosition < (imageTags ? imageTags.length : 0); tagPosition += 1) {
+    deployImage(imageTags[tagPosition], outStream, errStream);
+  }
 
   return undefined;
 };
