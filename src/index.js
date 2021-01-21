@@ -63,11 +63,9 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
-  const execArgs = imageTags
-    ? ['build', '-f', filename, '-t', tag, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.']
-    : ['build', '-f', filename, '-t', tag, '.'];
+  imageTags.push(tag);
 
-  const [buildError] = await try$(exec('docker', execArgs, {
+  const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
     errStream,
@@ -76,8 +74,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
 
   if (!shouldDeploy) return undefined;
 
-  deployImage(tag, outStream, errStream);
-  for (let tagPosition = 0; tagPosition < (imageTags ? imageTags.length : 0); tagPosition += 1) {
+  for (let tagPosition = 0; tagPosition < imageTags.length; tagPosition += 1) {
     deployImage(imageTags[tagPosition], outStream, errStream);
   }
 
@@ -89,7 +86,7 @@ const main = async () => {
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
   const shouldDeploy = core.getInput('deploy') !== 'false';
-  const imageTags = core.getInput('image-tags', { required: false });
+  const imageTags = core.getInput('image-tags', { required: false }) || '[]';
 
   const [gcloudError] = await try$(exec('gcloud', ['version']));
   if (gcloudError) return core.setFailed('The "gcloud" executable is not available');
