@@ -41,14 +41,6 @@ const stampStream = (stamp) => new Transform({
   },
 });
 
-const deployImage = async (tag, outStream, errStream) => {
-  const [deployError] = await try$(exec('docker', ['push', tag], {
-    outStream,
-    errStream,
-  }));
-  if (deployError) throw new Error(`Could not deploy '${tag}'`);
-};
-
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
@@ -74,9 +66,8 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
 
   if (!shouldDeploy) return undefined;
 
-  for (let tagPosition = 0; tagPosition < imageTags.length; tagPosition += 1) {
-    deployImage(imageTags[tagPosition], outStream, errStream);
-  }
+  const [deployError] = try$(exec('docker', ['push', '-a', imageName], { outStream, errStream }));
+  if (deployError) throw new Error(`Could not deploy one or more of '${imageTags}'`);
 
   return undefined;
 };
