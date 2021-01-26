@@ -19,7 +19,7 @@ jobs:
               "test/unrelated.txt"
             ]
           registry: gcr.io/cp-sandbox-nicholas-farl671
-          deploy: 'true'
+          deploy: 'false'
           image-tags: |
             [
               "test-tag",
