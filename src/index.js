@@ -47,7 +47,6 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
-  const tag = path.join(registry, subfolder, `${image}:${gitSHA}`);
   const imageName = path.join(registry, subfolder, image);
   const stamp = `${subfolder}/${filename}`;
   const outStream = stampStream(stamp);
@@ -55,14 +54,14 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
-  imageTags.push(tag);
+  imageTags.push(gitSHA);
 
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
     errStream,
   }));
-  if (buildError) throw new Error(`Could not build image '${tag}' from dockerfile '${dockerfile}' with additional tags '${imageTags}'.`);
+  if (buildError) throw new Error(`Could not build image '${gitSHA}' from dockerfile '${dockerfile}' with additional tags '${imageTags}'.`);
 
   if (!shouldDeploy) return undefined;
 
