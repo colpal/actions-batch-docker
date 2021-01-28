@@ -22,6 +22,7 @@ steps:
   # The gcloud CLI must be installed and configured on your choice of runner
   - uses: google-github-actions/setup-gcloud@master
     with:
+      # Needed to authenticate the docker CLI in a later step
       service_account_key: ${{ steps.vault.outputs.GKE_CREDENTIALS }}
       project_id: ${{ env.GKE_PROJECT }}
 
@@ -41,8 +42,8 @@ steps:
       changed-files: '${{ steps.changed.outputs.json }}'
       # The Docker registry prefix you are attempting to push to
       registry: gcr.io/your-project-id
-      # If set to false, the images will only be built and tagged. Defaults to true
-      deploy: true
+      # If set to 'false', the images will only be built and tagged. Defaults to 'true'
+      deploy: 'true'
       # JSON list of additional tags that will be added to each of the deployed images in the remote container repository. Defaults to empty list '[]'
       image-tags: '[]'
 ```
