@@ -75,8 +75,8 @@ const main = async () => {
   const registry = core.getInput('registry', { required: true });
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
-  const shouldDeploy = core.getInput('deploy') !== 'false';
-  const imageTags = core.getInput('image-tags', { required: false }) || '[]';
+  const shouldDeploy = core.getInput('deploy') === 'true';
+  const imageTags = core.getInput('image-tags');
 
   const [gcloudError] = await try$(exec('gcloud', ['version']));
   if (gcloudError) return core.setFailed('The "gcloud" executable is not available');

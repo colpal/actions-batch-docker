@@ -13,9 +13,12 @@ inputs:
     required: true
   deploy:
     description: Set to 'false' to disable deployment
-  image-tags:
-    description: JSON of additional tags to add to the deployed images in the remote container repository
     required: false
+    default: true
+  image-tags:
+    description: JSON list of additional tags that will be added to each of the deployed images in the remote container repository.
+    required: false
+    default: '[]'
 runs:
   using: node12
   main: dist/main.js
