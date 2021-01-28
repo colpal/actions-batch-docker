@@ -20,11 +20,11 @@ steps:
   - run: docker version
 
   # The gcloud CLI must be installed and configured on your choice of runner
-  - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+  - uses: google-github-actions/setup-gcloud@master
     with:
-      version: '301.0.0'
       # Needed to authenticate the docker CLI in a later step
-      service_account_key: ${{ secrets.GCP_SA_KEY }}
+      service_account_key: ${{ steps.vault.outputs.GKE_CREDENTIALS }}
+      project_id: ${{ env.GKE_PROJECT }}
 
   # Authenticate the docker CLI to push to the private GCR
   - run: gcloud auth configure-docker
@@ -44,6 +44,8 @@ steps:
       registry: gcr.io/your-project-id
       # If set to 'false', the images will only be built and tagged. Defaults to 'true'
       deploy: 'true'
+      # JSON list of additional tags that will be added to each of the deployed images in the remote container repository. Defaults to empty list '[]'
+      image-tags: '[]'
 ```
 
 Assume your project structure looked like the following, with the starred files being those that

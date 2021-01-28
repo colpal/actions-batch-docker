@@ -20,3 +20,8 @@ jobs:
             ]
           registry: gcr.io/cp-sandbox-nicholas-farl671
           deploy: 'false'
+          image-tags: |
+            [
+              "test-tag",
+              "second-test-tag"
+            ]
