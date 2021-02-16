@@ -43,7 +43,8 @@ const stampStream = (stamp) => new Transform({
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
-  const image = filename.match(/^Dockerfile\.(.*)$/)[1];
+  const regexMatch = filename.match(/^Dockerfile\.(.*)$/);
+  const image = regexMatch ? filename.match(/^Dockerfile\.(.*)$/)[1] : '';
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
