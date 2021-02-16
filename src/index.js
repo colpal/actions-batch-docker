@@ -56,7 +56,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const errStream = stampStream(stamp);
   errStream.pipe(process.stderr);
 
-  imageTags.push(gitSHA);
+  if (!imageTags.includes(gitSHA)) imageTags.push(gitSHA);
 
   console.log(imageTags);
 
