@@ -108,6 +108,8 @@ const main = async () => {
   const [matchError, matches] = await try$(globber.glob());
   if (matchError) return core.setFailed(`Can't execute glob for Dockerfiles: ${matchError}`);
 
+  console.log(matches);
+
   const pipelines = matches
     .filter((file) => {
       const dirname = path.dirname(path.relative(root, file));
