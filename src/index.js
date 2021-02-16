@@ -57,6 +57,8 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   errStream.pipe(process.stderr);
 
   imageTags.push(gitSHA);
+  console.log('filename:');
+  console.log(filename);
 
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
