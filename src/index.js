@@ -42,9 +42,16 @@ const stampStream = (stamp) => new Transform({
 });
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
+  console.log('dockerfile:');
+  console.log(dockerfile);
+  
   const filename = path.basename(dockerfile);
+  console.log('filename:');
+  console.log(filename);
   // matches 'Dockerfile' or 'Dockerfile.*', but not 'Dockerfile.'
   const regexMatch = filename.match(/^Dockerfile(?:\.(.+))?$/);
+  console.log('regexmatch:');
+  console.log(regexMatch);
   const image = regexMatch ? regexMatch[1] : '';
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
@@ -57,10 +64,6 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   errStream.pipe(process.stderr);
 
   imageTags.push(gitSHA);
-  console.log('filename:');
-  console.log(filename);
-  console.log('dockerfile:');
-  console.log(dockerfile);
 
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
