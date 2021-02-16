@@ -42,6 +42,7 @@ const stampStream = (stamp) => new Transform({
 });
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
+  console.log("Entered function.");
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
   const gitSHA = process.env.GITHUB_SHA;
