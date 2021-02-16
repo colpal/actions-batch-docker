@@ -98,7 +98,7 @@ const main = async () => {
   const [tagParseError, parsedImageTags] = try$(() => JSON.parse(imageTags));
   if (tagParseError) return core.setFailed(`Input image-tags is not valid JSON: ${parseError}`);
 
-  const [globError, globber] = await try$(glob.create(path.resolve(root, '**', /^Dockerfile(?:\.(.+))?$/)));
+  const [globError, globber] = await try$(glob.create(path.resolve(root, '**', 'Dockerfile*')));
   if (globError) return core.setFailed(`Can't create glob for Dockerfiles: ${globError}`);
 
   const [matchError, matches] = await try$(globber.glob());
