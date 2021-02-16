@@ -42,7 +42,6 @@ const stampStream = (stamp) => new Transform({
 });
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
-  console.log('Entered function.');
   const filename = path.basename(dockerfile);
   const image = filename.match(/^Dockerfile\.(.*)$/)[1];
   const gitSHA = process.env.GITHUB_SHA;
@@ -56,27 +55,19 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   errStream.pipe(process.stderr);
 
   imageTags.push(gitSHA);
-  console.log('Image tags:');
-  console.log(imageTags);
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
     errStream,
   }));
-  console.log('Built images.');
   if (buildError) throw new Error(`Could not build image '${gitSHA}' from dockerfile '${dockerfile}' with additional tags '${imageTags}'.`);
-  console.log('Did not throw error.');
   if (!shouldDeploy) return undefined;
-  console.log('Checked shouldDeploy.');
   const [deployError] = await try$(exec('docker', ['image', 'push', '-a', imageName], { cwd, outStream, errStream }));
-  console.log('Pushed Images.');
   if (deployError) throw new Error(`Could not deploy one or more of '${imageTags}'`);
-  console.log('Did not throw second error.');
   return undefined;
 };
 
 const main = async () => {
-  console.log('Entered Action');
   const registry = core.getInput('registry', { required: true });
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
