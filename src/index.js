@@ -55,15 +55,19 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   errStream.pipe(process.stderr);
 
   imageTags.push(gitSHA);
+
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
     errStream,
   }));
   if (buildError) throw new Error(`Could not build image '${gitSHA}' from dockerfile '${dockerfile}' with additional tags '${imageTags}'.`);
+
   if (!shouldDeploy) return undefined;
+
   const [deployError] = await try$(exec('docker', ['image', 'push', '-a', imageName], { cwd, outStream, errStream }));
   if (deployError) throw new Error(`Could not deploy one or more of '${imageTags}'`);
+
   return undefined;
 };
 
