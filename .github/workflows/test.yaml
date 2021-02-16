@@ -16,7 +16,9 @@ jobs:
             [
               "test/images/big-images/Dockerfile.image-1",
               "test/images/medium-images/Dockerfile.image-2",
-              "test/unrelated.txt"
+              "test/unrelated.txt",
+              "test/images/new-names/Dockerfile",
+              "test/images/new-names/Dockerfile.image-1"
             ]
           registry: gcr.io/cp-sandbox-nicholas-farl671
           deploy: 'false'
