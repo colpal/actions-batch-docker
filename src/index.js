@@ -49,7 +49,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   console.log('filename:');
   console.log(filename);
   // matches 'Dockerfile' or 'Dockerfile.*', but not 'Dockerfile.'
-  const regexMatch = filename.match(/^Dockerfile(?:\.(.+))?$/);
+  const regexMatch = filename.match(/^Dockerfile(?:\.(.+))?$/)[1];
   console.log('regexmatch:');
   console.log(regexMatch);
   const image = regexMatch ? regexMatch[1] : '';
