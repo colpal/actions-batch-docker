@@ -56,8 +56,11 @@ tasks/
 ├── task-a
 │   ├── Dockerfile.debian
 │   └── Dockerfile.ubuntu *
-└── task-b
-    └── Dockerfile.alpine *
+├── task-b
+|   └── Dockerfile.alpine *
+└── task-c
+    ├── Dockerfile        *
+    └── Dockerfile.ubuntu *
 .github/
 └── workflows
     └── main.yaml
@@ -71,6 +74,10 @@ This workflow would build/deploy the following:
   `gcr.io/your-project-id/task-a/ubuntu:$COMMIT_SHA`
 - `tasks/task-b/Dockerfile.alpine` would be tagged and deployed as
   `gcr.io/your-project-id/task-b/alpine:$COMMIT_SHA`
+- `tasks/task-c/Dockerfile` would be tagged and deployed as
+  `gcr.io/your-project-id/task-c:$COMMIT_SHA`
+- `tasks/task-c/Dockerfile.ubuntu` would be tagged and deployed as
+  `gcr.io/your-project-id/task-c/ubuntu:$COMMIT_SHA`
 
 This workflow would **not** build/deploy the following:
 
