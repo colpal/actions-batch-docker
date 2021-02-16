@@ -75,6 +75,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
 };
 
 const main = async () => {
+  console.log("Entered Action");
   const registry = core.getInput('registry', { required: true });
   const root = core.getInput('root-directory', { required: true });
   const changedFiles = core.getInput('changed-files', { required: true });
