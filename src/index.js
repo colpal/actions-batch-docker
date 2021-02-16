@@ -43,8 +43,9 @@ const stampStream = (stamp) => new Transform({
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
-  const regexMatch = filename.match(/^Dockerfile\.(.*)$/);
-  const image = regexMatch ? filename.match(/^Dockerfile\.(.*)$/)[1] : '';
+  // matches 'Dockerfile' or 'Dockerfile.*', but not 'Dockerfile.'
+  const regexMatch = filename.match(/^Dockerfile(?:\.(.+))?$/);
+  const image = regexMatch ? regexMatch[1] : '';
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
@@ -97,7 +98,7 @@ const main = async () => {
   const [tagParseError, parsedImageTags] = try$(() => JSON.parse(imageTags));
   if (tagParseError) return core.setFailed(`Input image-tags is not valid JSON: ${parseError}`);
 
-  const [globError, globber] = await try$(glob.create(path.resolve(root, '**', 'Dockerfile.*')));
+  const [globError, globber] = await try$(glob.create(path.resolve(root, '**', /^Dockerfile(?:\.(.+))?$/)));
   if (globError) return core.setFailed(`Can't create glob for Dockerfiles: ${globError}`);
 
   const [matchError, matches] = await try$(globber.glob());
