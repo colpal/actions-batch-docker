@@ -45,7 +45,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   const filename = path.basename(dockerfile);
   // matches 'Dockerfile' or 'Dockerfile.*', but not 'Dockerfile.'
   const regexMatch = filename.match(/^Dockerfile(?:\.(.+))?$/);
-  const [matchError, image] = try$(() => (regexMatch ? regexMatch[1] : ''));
+  const [matchError, image] = try$(() => (regexMatch[1] || ''));
   if (matchError) throw new Error(`${filename} points to an improperly named Dockerfile. Dockerfiles must either be 'Dockerfile' or 'Dockerfile.someName'.`);
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
