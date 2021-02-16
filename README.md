@@ -60,6 +60,8 @@ tasks/
 |   └── Dockerfile.alpine *
 └── task-c
     ├── Dockerfile        *
+    ├── Dockerfile.debian *
+    ├── Dockerfile.centos
     └── Dockerfile.ubuntu *
 .github/
 └── workflows
@@ -76,10 +78,13 @@ This workflow would build/deploy the following:
   `gcr.io/your-project-id/task-b/alpine:$COMMIT_SHA`
 - `tasks/task-c/Dockerfile` would be tagged and deployed as
   `gcr.io/your-project-id/task-c:$COMMIT_SHA`
+- `tasks/task-c/Dockerfile.debian` would be tagged and deployed as
+  `gcr.io/your-project-id/task-c/debian:$COMMIT_SHA`
 - `tasks/task-c/Dockerfile.ubuntu` would be tagged and deployed as
   `gcr.io/your-project-id/task-c/ubuntu:$COMMIT_SHA`
 
 This workflow would **not** build/deploy the following:
 
 - `tasks/task-a/Dockerfile.debian` would not be built because it did not change
+- `tasks/task-c/Dockerfile.centos` would not be built because it did not change
 - `unrelated/Dockerfile.centos` would not be built because it is outside of the root directory
