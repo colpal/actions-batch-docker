@@ -58,8 +58,6 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
 
   if (!imageTags.includes(gitSHA)) imageTags.push(gitSHA);
 
-  console.log(imageTags);
-
   const [buildError] = await try$(exec('docker', ['build', '-f', filename, ...imageTags.map((p) => ['-t', `${imageName}:${p}`]).flat(), '.'], {
     cwd,
     outStream,
