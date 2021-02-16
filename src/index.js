@@ -68,7 +68,7 @@ const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile
   console.log('Did not throw error.');
   if (!shouldDeploy) return undefined;
   console.log('Checked shouldDeploy.');
-  const [deployError] = try$(exec('docker', ['push', '-a', imageName], { cwd, outStream, errStream }));
+  const [deployError] = try$(exec('docker', ['image', 'push', '-a', imageName], { cwd, outStream, errStream }));
   console.log('Pushed Images.');
   if (deployError) throw new Error(`Could not deploy one or more of '${imageTags}'`);
   console.log('Did not throw second error.');
