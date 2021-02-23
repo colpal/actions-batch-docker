@@ -54,37 +54,35 @@ had changes in the latest commit:
 ```
 tasks/
 ├── task-a
-│   ├── Dockerfile.debian
-│   └── Dockerfile.ubuntu *
+│   └── Dockerfile *
 ├── task-b
-|   └── Dockerfile.alpine *
-└── task-c
-    ├── Dockerfile        *
-    ├── Dockerfile.debian *
-    ├── Dockerfile.centos
-    └── Dockerfile.ubuntu *
+|   ├── Dockerfile
+|   └── Scripts
+|       ├── entrypoint.py *
+|       └── requirements.txt
+├── task-c
+│   └── Dockerfile
+└── task-d
+    ├── Dockerfile
+    └── Scripts
+        ├── entrypoint.py
+        └── requirements.txt
 .github/
 └── workflows
     └── main.yaml
 unrelated/
-└── Dockerfile.centos *
+└── Dockerfile *
 ```
 
 This workflow would build/deploy the following:
 
-- `tasks/task-a/Dockerfile.ubuntu` would be tagged and deployed as
-  `gcr.io/your-project-id/task-a/ubuntu:$COMMIT_SHA`
-- `tasks/task-b/Dockerfile.alpine` would be tagged and deployed as
-  `gcr.io/your-project-id/task-b/alpine:$COMMIT_SHA`
-- `tasks/task-c/Dockerfile` would be tagged and deployed as
-  `gcr.io/your-project-id/task-c:$COMMIT_SHA`
-- `tasks/task-c/Dockerfile.debian` would be tagged and deployed as
-  `gcr.io/your-project-id/task-c/debian:$COMMIT_SHA`
-- `tasks/task-c/Dockerfile.ubuntu` would be tagged and deployed as
-  `gcr.io/your-project-id/task-c/ubuntu:$COMMIT_SHA`
+- `tasks/task-a/Dockerfile` would be tagged and deployed as
+  `gcr.io/your-project-id/task-a:$COMMIT_SHA`
+- `tasks/task-b/Dockerfile` would be tagged and deployed as
+  `gcr.io/your-project-id/task-b:$COMMIT_SHA`
 
 This workflow would **not** build/deploy the following:
 
-- `tasks/task-a/Dockerfile.debian` would not be built because it did not change
-- `tasks/task-c/Dockerfile.centos` would not be built because it did not change
-- `unrelated/Dockerfile.centos` would not be built because it is outside of the root directory
+- `tasks/task-c/Dockerfile` would not be built because it did not change
+- `tasks/task-d/Dockerfile` would not be built because nothing in its directory changed
+- `unrelated/Dockerfile` would not be built because it is outside of the root directory
