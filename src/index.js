@@ -43,7 +43,6 @@ const stampStream = (stamp) => new Transform({
 
 const buildThenDeploy = (registry, shouldDeploy, imageTags) => async (dockerfile) => {
   const filename = path.basename(dockerfile);
-  // matches 'Dockerfile' or 'Dockerfile.*', but not 'Dockerfile.'
   const gitSHA = process.env.GITHUB_SHA;
   const cwd = path.dirname(dockerfile);
   const subfolder = path.basename(cwd);
