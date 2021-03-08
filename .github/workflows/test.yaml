@@ -14,9 +14,10 @@ jobs:
           root-directory: test/images
           changed-files: |
             [
-              "test/images/big-images/Dockerfile.image-1",
-              "test/images/medium-images/Dockerfile.image-2",
-              "test/unrelated.txt"
+              "test/images/big-images/Dockerfile",
+              "test/images/medium-images/Dockerfile",
+              "test/unrelated.txt",
+              "test/images/new-names/Dockerfile"
             ]
           registry: gcr.io/cp-sandbox-nicholas-farl671
           deploy: 'false'
