@@ -29,7 +29,7 @@ steps:
   # The gcloud CLI must be installed and configured on your choice of runner
   - uses: 'google-github-actions/setup-gcloud@v0'
 
-  # Authenticate the docker CLI to push to the private GCR
+  # Authenticate the docker CLI to push to the private GAR
   - run: gcloud auth configure-docker "$GAR_REGION-docker.pkg.dev"
 
   # This list of changed files will be necessary for a required input
