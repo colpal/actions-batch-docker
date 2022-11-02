@@ -85,6 +85,7 @@ const main = async () => {
 
   const [parseError, parsedFiles] = try$(() => JSON.parse(changedFiles));
   if (parseError) return core.setFailed(`Input changed-files is not valid JSON: ${parseError}`);
+  if (!Array.isArray(parsedFiles)) return core.setFailed(`Input changed-files is not an Array`);
 
   const relevantChanges = new Set(
     parsedFiles
