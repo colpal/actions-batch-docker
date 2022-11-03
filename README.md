@@ -42,7 +42,7 @@ steps:
       root-directory: tasks/
       # A JSON formatted list of files that changed since the last workflow run.
       # This is used to only build Docker images that could have changed
-      changed-files: '${{ fromJSON(steps.changed.outputs.json).all }}'
+      changed-files: '${{ toJSON(fromJSON(steps.changed.outputs.json).all) }}'
       # The Docker registry prefix you are attempting to push to
       registry: "${{ env.GAR_REGION }}-docker.pkg.dev/${{ steps.auth.outputs.project_id}}/${{ env.GAR_REPOSITORY }}"
       # If set to 'false', the images will only be built and tagged. Defaults
