@@ -105,7 +105,9 @@ const main = async () => {
   const pipelines = matches
     .filter((file) => {
       const dirname = path.dirname(path.relative(root, file));
-      return includesBy(relevantChanges, (change) => change.startsWith(dirname));
+      return includesBy(relevantChanges, (change) => {
+        return change === dirname || change.startsWith(dirname + path.sep);
+      });
     })
     .map(buildThenDeploy(registry, shouldDeploy, parsedImageTags));
 
